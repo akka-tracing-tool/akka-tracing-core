@@ -4,6 +4,7 @@ import java.util.UUID
 
 import akka.actor.Actor
 
+case class MessageWrapper(id: UUID, msg: AnyRef)
 
 trait DistributedStackTraceMessage {
   val stackTrace = Thread.currentThread().getStackTrace
@@ -20,9 +21,9 @@ trait TracedActor {
     } catch {
       //TODO: make aspectj exception handler
       case exception: Exception => println("INTERCEPTED exception " + exception)
-//        val oldStackTrace = exception.getStackTrace
-//        val newStackTrace = oldStackTrace ++ msg.asInstanceOf[DistributedStackTraceMessage].stackTrace
-//        exception.setStackTrace(newStackTrace)
+        //        val oldStackTrace = exception.getStackTrace
+        //        val newStackTrace = oldStackTrace ++ msg.asInstanceOf[DistributedStackTraceMessage].stackTrace
+        //        exception.setStackTrace(newStackTrace)
         throw exception
     }
   }
