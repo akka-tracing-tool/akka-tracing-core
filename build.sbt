@@ -1,7 +1,6 @@
 val org = "pl.edu.agh.iet"
-val appVersion = "0.0.1-SNAPSHOT"
+val appVersion = "0.0.1"
 
-val UsedScalaVersion = "2.11.7"
 val Slf4jVersion = "1.7.12"
 val ConfigVersion = "1.3.0"
 val AkkaVersion = "2.3.9"
@@ -14,7 +13,7 @@ version := appVersion
 
 organization := org
 
-scalaVersion := UsedScalaVersion
+crossScalaVersions := Seq("2.10.5", "2.11.7")
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
