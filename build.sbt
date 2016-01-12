@@ -21,12 +21,14 @@ scalaVersion := UsedScalaVersion
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
   "com.typesafe.akka" %% "akka-remote" % AkkaVersion,
+  "com.typesafe.akka" %% "akka-testkit" % AkkaVersion,
   "com.typesafe" % "config" % ConfigVersion,
   "com.typesafe.slick" %% "slick" % SlickVersion,
   "com.typesafe.slick" %% "slick-hikaricp" % SlickVersion,
   "org.slf4j" % "slf4j-api" % Slf4jVersion,
   "org.slf4j" % "slf4j-simple" % Slf4jVersion,
-  "org.scalatest" %% "scalatest" % ScalaTestVersion % "test"
+  "org.scalatest" %% "scalatest" % ScalaTestVersion % "test",
+  "com.h2database" % "h2" % "1.4.190" % Test
 )
 
 lazy val coreProject = project in file(".")
