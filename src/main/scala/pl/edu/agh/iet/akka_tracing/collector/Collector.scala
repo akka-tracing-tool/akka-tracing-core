@@ -2,12 +2,12 @@ package pl.edu.agh.iet.akka_tracing.collector
 
 import java.util.UUID
 
-import akka.actor.{Actor, Props}
+import akka.actor.{ Actor, Props }
 import com.typesafe.config._
-import pl.edu.agh.iet.akka_tracing.database.{DatabaseUtils, CollectorDBMessagesRelation, CollectorDBMessage}
+import pl.edu.agh.iet.akka_tracing.database.{ CollectorDBMessage, CollectorDBMessagesRelation, DatabaseUtils }
 
-import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration._
+import scala.concurrent.{ Await, ExecutionContext }
 import scala.language.postfixOps
 
 object Collector {
@@ -42,7 +42,7 @@ class DatabaseCollector(config: Config) extends Collector {
   val dc = databaseUtils.getDatabaseConfig
   implicit val executor: ExecutionContext = context.system.dispatcher
 
-  import dc.driver.api._
+  import dc.profile.api._
   import databaseUtils._
 
   val db = dc.db

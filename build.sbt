@@ -1,12 +1,12 @@
 val org = "pl.edu.agh.iet"
-val appVersion = "0.0.2"
+val appVersion = "0.0.3"
 
-val Slf4jVersion = "1.7.12"
+val Slf4jVersion = "1.7.24"
 val ConfigVersion = "1.3.0"
-val AkkaVersion = "2.3.9"
-val ScalaTestVersion = "2.2.4"
-val SlickVersion = "3.1.1"
-val UsedScalaVersion = "2.11.7"
+val AkkaVersion = "2.4.17"
+val ScalaTestVersion = "3.0.1"
+val SlickVersion = "3.2.0"
+val UsedScalaVersion = "2.11.8"
 
 name := "akka-tracing-core"
 
@@ -14,9 +14,11 @@ version := appVersion
 
 organization := org
 
-crossScalaVersions := Seq("2.10.5", "2.11.7")
+crossScalaVersions := Seq("2.10.5", "2.11.8")
 
 scalaVersion := UsedScalaVersion
+
+scalacOptions ++= Seq("-feature", "-deprecation")
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % AkkaVersion,

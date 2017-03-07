@@ -11,7 +11,7 @@ trait DistributedStackTraceMessage {
 }
 
 trait TracedActor {
-  self: Actor =>
+  actor: Actor =>
 
   var MessageWrapperId: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
 

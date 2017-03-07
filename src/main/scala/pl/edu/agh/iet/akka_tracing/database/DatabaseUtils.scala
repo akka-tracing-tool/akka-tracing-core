@@ -3,9 +3,9 @@ package pl.edu.agh.iet.akka_tracing.database
 import java.util.UUID
 
 import com.typesafe.config._
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.{ Logger, LoggerFactory }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 case class CollectorDBMessage(id: UUID,
                               sender: String,
@@ -21,25 +21,31 @@ case class CollectorDBMessagesRelation(id1: UUID, id2: UUID) {
 class DatabaseUtils(val config: Config) {
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  import slick.backend.DatabaseConfig
-  import slick.driver.JdbcProfile
+  import slick.basic.DatabaseConfig
+  import slick.jdbc.JdbcProfile
   import slick.jdbc.meta._
 
   val dc = DatabaseConfig.forConfig[JdbcProfile]("database", config)
 
-  import dc.driver.api._
+  import dc.profile.api._
 
   class CollectorDBMessages(tag: Tag) extends Table[CollectorDBMessage](tag, "messages") {
     def id = column[UUID]("id", O.PrimaryKey)
+
     def sender = column[String]("sender")
+
     def receiver = column[Option[String]]("receiver")
+
     override def * = (id, sender, receiver) <> (CollectorDBMessage.tupled, CollectorDBMessage.unapply)
   }
 
   class CollectorDBMessagesRelations(tag: Tag) extends Table[CollectorDBMessagesRelation](tag, "relation") {
     def id1 = column[UUID]("id1")
+
     def id2 = column[UUID]("id2")
+
     def pk = primaryKey("pk", (id1, id2))
+
     override def * = (id1, id2) <> (CollectorDBMessagesRelation.tupled, CollectorDBMessagesRelation.unapply)
   }
 
