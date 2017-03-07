@@ -31,3 +31,7 @@ class StackedDisjunctionMessageFilter(filters: List[MessageFilter]) extends Mess
     }
   }
 }
+
+object NoOpMessageFilter extends MessageFilter {
+  override def apply(message: Any): Boolean = true
+}
