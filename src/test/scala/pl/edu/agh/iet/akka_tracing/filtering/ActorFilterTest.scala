@@ -1,21 +1,11 @@
 package pl.edu.agh.iet.akka_tracing.filtering
 
-import akka.actor.{ Actor, ActorSystem, Props }
-import org.scalatest.{ BeforeAndAfterAll, FlatSpec }
+import akka.actor.Actor
+import org.scalatest.FlatSpec
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-
-class ActorFilterTest extends FlatSpec with BeforeAndAfterAll {
+class ActorFilterTest extends FlatSpec {
 
   import ActorFilterTest._
-
-  val system = ActorSystem()
-
-  override def afterAll() {
-    super.afterAll()
-    Await.result(system.terminate(), Duration.Inf)
-  }
 
   "NoOpActorfilter" should "return true" in {
     val filter = NoOpActorFilter

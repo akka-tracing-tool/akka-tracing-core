@@ -6,9 +6,9 @@ import akka.actor.Actor
 
 case class MessageWrapper(id: UUID, msg: AnyRef)
 
-trait DistributedStackTraceMessage {
-  val stackTrace = Thread.currentThread().getStackTrace
-}
+//trait DistributedStackTraceMessage {
+//  val stackTrace = Thread.currentThread().getStackTrace
+//}
 
 trait TracedActor {
   actor: Actor =>

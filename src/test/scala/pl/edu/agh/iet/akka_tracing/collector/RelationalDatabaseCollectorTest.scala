@@ -13,7 +13,11 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class DatabaseCollectorTest(_system: ActorSystem) extends TestKit(_system) with FlatSpecLike with ImplicitSender {
+class RelationalDatabaseCollectorTest(_system: ActorSystem)
+  extends TestKit(_system)
+    with FlatSpecLike
+    with ImplicitSender {
+
   def this() = this(ActorSystem("DatabaseCollectorTest"))
 
   val configFile = File.createTempFile("akka_tracing.conf.collector.in-memory-db", "")
@@ -37,7 +41,7 @@ class DatabaseCollectorTest(_system: ActorSystem) extends TestKit(_system) with 
 
 
   "A database's tables" should "contains 1 row each" in {
-    val collector = system.actorOf(DatabaseCollector.props(config))
+    val collector = system.actorOf(RelationalDatabaseCollector.props(config))
     val uuid = UUID.randomUUID()
     collector ! CollectorMessage(uuid, Option("sender"), None)
     collector ! CollectorMessage(uuid, None, Option("receiver"))
