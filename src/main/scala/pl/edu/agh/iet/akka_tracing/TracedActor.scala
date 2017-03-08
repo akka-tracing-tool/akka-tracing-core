@@ -6,12 +6,12 @@ import akka.actor.Actor
 
 case class MessageWrapper(id: UUID, msg: AnyRef)
 
-trait DistributedStackTraceMessage {
-  val stackTrace = Thread.currentThread().getStackTrace
-}
+//trait DistributedStackTraceMessage {
+//  val stackTrace = Thread.currentThread().getStackTrace
+//}
 
 trait TracedActor {
-  self: Actor =>
+  actor: Actor =>
 
   var MessageWrapperId: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
 

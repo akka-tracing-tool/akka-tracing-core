@@ -2,12 +2,12 @@ package pl.edu.agh.iet.akka_tracing.collector
 
 import java.util.UUID
 
-import akka.actor.{Actor, Props}
+import akka.actor.{ Actor, Props }
 import com.typesafe.config._
-import pl.edu.agh.iet.akka_tracing.database.{DatabaseUtils, CollectorDBMessagesRelation, CollectorDBMessage}
+import pl.edu.agh.iet.akka_tracing.database.{ CollectorDBMessage, CollectorDBMessagesRelation, DatabaseUtils }
 
-import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration._
+import scala.concurrent.{ Await, ExecutionContext }
 import scala.language.postfixOps
 
 object Collector {
@@ -22,9 +22,9 @@ trait Collector extends Actor {
 
   import Collector._
 
-  private[collector] def handleCollectorMessage(msg: CollectorMessage): Unit
+  protected def handleCollectorMessage(msg: CollectorMessage): Unit
 
-  private[collector] def handleRelationMessage(msg: RelationMessage): Unit
+  protected def handleRelationMessage(msg: RelationMessage): Unit
 
   override def receive: Receive = {
     case msg: CollectorMessage =>
@@ -34,15 +34,15 @@ trait Collector extends Actor {
   }
 }
 
-class DatabaseCollector(config: Config) extends Collector {
+final class RelationalDatabaseCollector(config: Config) extends Collector {
 
   import Collector._
 
   val databaseUtils = new DatabaseUtils(config)
   val dc = databaseUtils.getDatabaseConfig
-  implicit val executor: ExecutionContext = context.system.dispatcher
+  implicit val executor: ExecutionContext = context.dispatcher
 
-  import dc.driver.api._
+  import dc.profile.api._
   import databaseUtils._
 
   val db = dc.db
@@ -50,7 +50,7 @@ class DatabaseCollector(config: Config) extends Collector {
   val messages = TableQuery[CollectorDBMessages]
   val relations = TableQuery[CollectorDBMessagesRelations]
 
-  override private[collector] def handleCollectorMessage(msg: CollectorMessage): Unit = msg match {
+  override protected def handleCollectorMessage(msg: CollectorMessage): Unit = msg match {
     case CollectorMessage(id, sender, None) =>
       Await.result(future, 5 seconds)
       val f = db.run(messages += CollectorDBMessage(id, sender.get, None))
@@ -61,7 +61,7 @@ class DatabaseCollector(config: Config) extends Collector {
       Await.result(f, 5 seconds)
   }
 
-  override private[collector] def handleRelationMessage(msg: RelationMessage): Unit = msg match {
+  override protected def handleRelationMessage(msg: RelationMessage): Unit = msg match {
     case RelationMessage(id1, id2) =>
       Await.result(future, 5 seconds)
       val f = db.run(relations += CollectorDBMessagesRelation(id1, id2))
@@ -69,6 +69,6 @@ class DatabaseCollector(config: Config) extends Collector {
   }
 }
 
-object DatabaseCollector {
-  def props(config: Config): Props = Props(classOf[DatabaseCollector], config)
+object RelationalDatabaseCollector {
+  def props(config: Config): Props = Props(classOf[RelationalDatabaseCollector], config)
 }
