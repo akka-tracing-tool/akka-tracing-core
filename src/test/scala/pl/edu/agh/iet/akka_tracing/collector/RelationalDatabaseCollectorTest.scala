@@ -1,6 +1,5 @@
 package pl.edu.agh.iet.akka_tracing.collector
 
-import java.io.{ BufferedWriter, File, FileWriter }
 import java.util.UUID
 
 import akka.actor.ActorSystem
@@ -20,9 +19,7 @@ class RelationalDatabaseCollectorTest(_system: ActorSystem)
 
   def this() = this(ActorSystem("DatabaseCollectorTest"))
 
-  val configFile = File.createTempFile("akka_tracing.conf.collector.in-memory-db", "")
-  val bufferedWriter = new BufferedWriter(new FileWriter(configFile))
-  bufferedWriter.write(
+  val configFile =
     """
       |    database {
       |      profile = "slick.jdbc.H2Profile$"
@@ -31,9 +28,8 @@ class RelationalDatabaseCollectorTest(_system: ActorSystem)
       |        url = "jdbc:h2:mem:test"
       |      }
       |    }
-    """.stripMargin)
-  bufferedWriter.close()
-  val config = ConfigFactory.parseFile(configFile)
+    """.stripMargin
+  val config = ConfigFactory.parseString(configFile)
 
   import slick.jdbc.H2Profile.api._
 

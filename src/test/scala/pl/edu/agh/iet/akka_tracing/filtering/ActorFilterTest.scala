@@ -8,7 +8,7 @@ class ActorFilterTest extends FlatSpec {
   import ActorFilterTest._
 
   "NoOpActorfilter" should "return true" in {
-    val filter = NoOpActorFilter
+    val filter = new NoOpActorFilter
     val actors = List[Class[_]](classOf[Test1], classOf[Test2])
     val expected = List(true, true)
     assert(actors.map(filter.apply) == expected)
