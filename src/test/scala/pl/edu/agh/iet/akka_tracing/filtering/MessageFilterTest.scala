@@ -9,7 +9,7 @@ class MessageFilterTest extends FlatSpec {
   import MessageFilterTest._
 
   "NoOpMessagefilter" should "return true" in {
-    val filter = NoOpMessageFilter
+    val filter = new NoOpMessageFilter
     val messages = List(Test1("yes"), Test2("nope"))
     val expected = List(true, true)
     assert(messages.map(filter.apply) == expected)

@@ -4,34 +4,30 @@ trait ActorFilter {
   def apply(actorClass: Class[_]): Boolean
 }
 
-class ByClassesAllowActorFilter(allowedClasses: List[Class[_]]) extends ActorFilter {
+class ByClassesAllowActorFilter(val allowedClasses: List[Class[_]]) extends ActorFilter {
   override def apply(actorClass: Class[_]): Boolean = {
     allowedClasses.exists(`class` => `class`.isAssignableFrom(actorClass))
   }
 }
 
-class ByClassesDenyActorFilter(deniedClasses: List[Class[_]]) extends ActorFilter {
+class ByClassesDenyActorFilter(val deniedClasses: List[Class[_]]) extends ActorFilter {
   override def apply(actorClass: Class[_]): Boolean = {
     !deniedClasses.exists(`class` => `class`.isAssignableFrom(actorClass))
   }
 }
 
-class StackedConjunctionActorFilter(filters: List[ActorFilter]) extends ActorFilter {
+class StackedConjunctionActorFilter(val filters: List[ActorFilter]) extends ActorFilter {
   override def apply(actorClass: Class[_]): Boolean = {
-    filters.foldLeft(true) {
-      case (result, filter) => result && filter(actorClass)
-    }
+    !filters.exists(filter => !filter(actorClass))
   }
 }
 
-class StackedDisjunctionActorFilter(filters: List[ActorFilter]) extends ActorFilter {
+class StackedDisjunctionActorFilter(val filters: List[ActorFilter]) extends ActorFilter {
   override def apply(actorClass: Class[_]): Boolean = {
-    filters.foldLeft(false) {
-      case (result, filter) => result || filter(actorClass)
-    }
+    filters.exists(filter => filter(actorClass))
   }
 }
 
-object NoOpActorFilter extends ActorFilter {
+class NoOpActorFilter extends ActorFilter {
   override def apply(actorClass: Class[_]): Boolean = true
 }
