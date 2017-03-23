@@ -1,6 +1,5 @@
 package pl.edu.agh.iet.akka_tracing.filtering
 
-import akka.actor.Actor
 import org.scalatest.FlatSpec
 
 class ActorFilterTest extends FlatSpec {
@@ -51,16 +50,8 @@ class ActorFilterTest extends FlatSpec {
 
 object ActorFilterTest {
 
-  class Test1 extends Actor {
-    override def receive: Receive = {
-      case _ => println("Received a message")
-    }
-  }
+  case class Test1()
 
-  class Test2 extends Actor {
-    override def receive: Receive = {
-      case _ => println("Received a message")
-    }
-  }
+  case class Test2()
 
 }

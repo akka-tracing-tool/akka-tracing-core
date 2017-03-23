@@ -1,9 +1,7 @@
 package pl.edu.agh.iet.akka_tracing.filtering
 
 import com.typesafe.config.Config
-
-import scala.collection.JavaConverters._
-import scala.util.Try
+import pl.edu.agh.iet.akka_tracing.config.ConfigUtils._
 
 class MessageFilteringConfigurationReader(config: Config, classLoader: ClassLoader) {
   private val PackagePrefix = "pl.edu.agh.iet.akka_tracing.filtering"
@@ -37,34 +35,32 @@ class MessageFilteringConfigurationReader(config: Config, classLoader: ClassLoad
   }
 
   def createFilter(config: Config): MessageFilter = {
-    val className = Try(config.getString("filter")).getOrElse("noop")
+    val className = config.getOrElse[String]("filter", "noop")
     className match {
       case name if NoOpMessageFilterNames contains name => new NoOpMessageFilter
       case name if StackedConjunctionMessageFilterNames contains name =>
-        val configs = config.getConfigList("arguments").asScala.toList
+        val configs = config.getOrElse[List[Config]]("arguments", List())
         val filters = configs.map { config => createFilter(config) }
         new StackedConjunctionMessageFilter(filters)
       case name if StackedDisjunctionMessageFilterNames contains name =>
-        val configs = config.getConfigList("arguments").asScala.toList
+        val configs = config.getOrElse[List[Config]]("arguments", List())
         val filters = configs.map { config => createFilter(config) }
         new StackedDisjunctionMessageFilter(filters)
       case name if ByClassesAllowMessageFilterNames contains name =>
-        val classList = config.getStringList("arguments").asScala.toList.map { allowedClassName =>
+        val classList = config.getOrElse[List[String]]("arguments", List()).map { allowedClassName =>
           classLoader.loadClass(allowedClassName)
         }
         new ByClassesAllowMessageFilter(classList)
       case name if ByClassesDenyMessageFilterNames contains name =>
-        val classList = config.getStringList("arguments").asScala.toList.map { deniedClassName =>
+        val classList = config.getOrElse[List[String]]("arguments", List()).map { deniedClassName =>
           classLoader.loadClass(deniedClassName)
         }
         new ByClassesDenyMessageFilter(classList)
       case name if ProbabilityMessageSamplerNames contains name =>
-        val probability = config.getDoubleList("arguments").asScala.head
+        val probability = config.getOrElse[List[Double]]("arguments", List(1.0d)).head
         new ProbabilityMessageSampler(probability)
       case _ =>
-        Try(config.getString("constructorClassName"))
-          .toOption
-          .fold[MessageFilterConstructor](
+        config.getOption[String]("constructorClassName").fold[MessageFilterConstructor](
           new DefaultMessageFilterConstructor(
             classLoader.loadClass(className)
           )
