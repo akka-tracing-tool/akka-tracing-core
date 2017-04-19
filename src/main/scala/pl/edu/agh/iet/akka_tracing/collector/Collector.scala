@@ -4,7 +4,6 @@ import java.util.UUID
 
 import com.typesafe.config.Config
 import org.json4s.JValue
-import pl.edu.agh.iet.akka_tracing.collector.Collector.{ CollectorReceiverMessage, CollectorSenderMessage, RelationMessage }
 
 import scala.concurrent.ExecutionContext
 
@@ -36,6 +35,9 @@ trait CollectorConstructor {
 }
 
 class NoOpCollector(implicit val ec: ExecutionContext) extends Collector {
+
+  import Collector._
+
   override def handleSenderMessage(msg: CollectorSenderMessage): Unit = {}
 
   override def handleReceiverMessage(msg: CollectorReceiverMessage): Unit = {}
