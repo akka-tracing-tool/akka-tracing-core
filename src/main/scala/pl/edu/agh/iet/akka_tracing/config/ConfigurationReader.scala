@@ -36,6 +36,9 @@ class ConfigurationReader (config: Config, classLoader: ClassLoader)
     val RelationalDatabaseCollectorClassNames = Seq(
       "relational", "RelationalDatabaseCollector", s"$PackagePrefix.RelationalDatabaseCollector"
     )
+    val CouchDbCollectorClassNames = Seq(
+      "couch", "couchdb", "CouchDbCollector", s"$PackagePrefix.CouchDbCollector"
+    )
 
     val collectorClassName = collectorConfig.getOrElse[String]("className", "noop")
 
@@ -44,6 +47,8 @@ class ConfigurationReader (config: Config, classLoader: ClassLoader)
         s"$PackagePrefix.NoOpCollectorConstructor"
       case s if RelationalDatabaseCollectorClassNames contains s =>
         s"$PackagePrefix.RelationalDatabaseCollectorConstructor"
+      case s if CouchDbCollectorClassNames contains s =>
+        s"$PackagePrefix.CouchDbCollectorConstructor"
       case _ =>
         collectorConfig.getString("constructorClassName")
     }
@@ -58,18 +63,23 @@ class ConfigurationReader (config: Config, classLoader: ClassLoader)
 
   def getDataSource: DataSource = {
     val PackagePrefix = "pl.edu.agh.iet.akka_tracing.visualization.data"
-    val NoOpCollectorClassNames = Seq("noop", "NoOpCollector", s"$PackagePrefix.NoOpCollector")
+    val NoOpDataSource = Seq("noop", "NoOpDataSource", s"$PackagePrefix.NoOpDataSource")
     val RelationalDatabaseCollectorClassNames = Seq(
       "relational", "RelationalDatabaseDataSource", s"$PackagePrefix.RelationalDatabaseDataSource"
+    )
+    val CouchDbCollectorClassNames = Seq(
+      "couch", "couchdb", "CouchDbDataSource", s"$PackagePrefix.CouchDbDataSource"
     )
 
     val dataSourceClassName = collectorConfig.getOrElse[String]("dataSourceClassName", "noop")
 
     val dataSourceConstructorClassName = dataSourceClassName match {
-      case s if NoOpCollectorClassNames contains s =>
+      case s if NoOpDataSource contains s =>
         s"$PackagePrefix.NoOpDataSourceConstructor"
       case s if RelationalDatabaseCollectorClassNames contains s =>
         s"$PackagePrefix.RelationalDatabaseDataSourceConstructor"
+      case s if CouchDbCollectorClassNames contains s =>
+        s"$PackagePrefix.CouchDbDataSourceConstructor"
       case _ =>
         collectorConfig.getString("constructorClassName")
     }

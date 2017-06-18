@@ -1,34 +1,19 @@
 package pl.edu.agh.iet.akka_tracing.collector
 
-import java.util.UUID
-
 import com.typesafe.config.Config
-import org.json4s.JValue
-import pl.edu.agh.iet.akka_tracing.collector.Collector.{ CollectorReceiverMessage, CollectorSenderMessage, RelationMessage }
+import pl.edu.agh.iet.akka_tracing.model.{ MessagesRelation, ReceiverMessage, SenderMessage }
 
 import scala.concurrent.ExecutionContext
 
-object Collector {
-
-  case class CollectorSenderMessage(id: UUID, sender: String, message: Option[JValue])
-
-  case class CollectorReceiverMessage(id: UUID, receiver: String)
-
-  case class RelationMessage(id1: UUID, id2: UUID)
-
-}
-
 trait Collector {
-
-  import Collector._
 
   protected implicit def ec: ExecutionContext
 
-  def handleSenderMessage(msg: CollectorSenderMessage): Unit
+  def handleSenderMessage(msg: SenderMessage): Unit
 
-  def handleReceiverMessage(msg: CollectorReceiverMessage): Unit
+  def handleReceiverMessage(msg: ReceiverMessage): Unit
 
-  def handleRelationMessage(msg: RelationMessage): Unit
+  def handleRelationMessage(msg: MessagesRelation): Unit
 }
 
 trait CollectorConstructor {
@@ -36,11 +21,12 @@ trait CollectorConstructor {
 }
 
 class NoOpCollector(implicit val ec: ExecutionContext) extends Collector {
-  override def handleSenderMessage(msg: CollectorSenderMessage): Unit = {}
 
-  override def handleReceiverMessage(msg: CollectorReceiverMessage): Unit = {}
+  override def handleSenderMessage(msg: SenderMessage): Unit = {}
 
-  override def handleRelationMessage(msg: RelationMessage): Unit = {}
+  override def handleReceiverMessage(msg: ReceiverMessage): Unit = {}
+
+  override def handleRelationMessage(msg: MessagesRelation): Unit = {}
 }
 
 class NoOpCollectorConstructor extends CollectorConstructor {

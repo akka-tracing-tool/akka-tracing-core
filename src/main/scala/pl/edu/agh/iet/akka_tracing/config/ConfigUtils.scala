@@ -15,9 +15,21 @@ private[akka_tracing] object ConfigUtils {
     def fromConfig(config: Config, path: String): Option[T]
   }
 
+  implicit val booleanConfigValueReader = new ConfigValueReader[Boolean] {
+    override def fromConfig(config: Config, path: String): Option[Boolean] = {
+      Try(config.getBoolean(path)).toOption
+    }
+  }
+
   implicit val doubleConfigValueReader = new ConfigValueReader[Double] {
     override def fromConfig(config: Config, path: String): Option[Double] = {
       Try(config.getDouble(path)).toOption
+    }
+  }
+
+  implicit val intConfigValueReader = new ConfigValueReader[Int] {
+    override def fromConfig(config: Config, path: String): Option[Int] = {
+      Try(config.getInt(path)).toOption
     }
   }
 
