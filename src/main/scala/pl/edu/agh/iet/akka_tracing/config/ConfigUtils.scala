@@ -63,6 +63,11 @@ private[akka_tracing] object ConfigUtils {
   }
 
   implicit class RichConfig(config: Config) {
+    def \(path: String): Config = get[Config](path)
+
+    def get[T: ConfigValueReader](path: String): T =
+      getOption(path)(implicitly[ConfigValueReader[T]]).get
+
     def getOption[T: ConfigValueReader](path: String): Option[T] =
       implicitly[ConfigValueReader[T]].fromConfig(config, path)
 

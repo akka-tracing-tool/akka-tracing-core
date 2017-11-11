@@ -1,26 +1,41 @@
 package pl.edu.agh.iet.akka_tracing.collector
 
+import akka.actor.{ Actor, Props }
 import com.typesafe.config.Config
 import pl.edu.agh.iet.akka_tracing.model.{ MessagesRelation, ReceiverMessage, SenderMessage }
 
 import scala.concurrent.ExecutionContext
 
-trait Collector {
+trait Collector extends Actor {
 
-  protected implicit def ec: ExecutionContext
+  protected implicit val ec: ExecutionContext = context.dispatcher
+
+  override def receive: Receive = {
+    case msg: SenderMessage => handleSenderMessage(msg)
+    case msg: ReceiverMessage => handleReceiverMessage(msg)
+    case msg: MessagesRelation => handleRelationMessage(msg)
+    case msg =>
+      if (handleOtherMessages.isDefinedAt(msg)) {
+        handleOtherMessages.apply(msg)
+      } else {
+        unhandled(msg)
+      }
+  }
 
   def handleSenderMessage(msg: SenderMessage): Unit
 
   def handleReceiverMessage(msg: ReceiverMessage): Unit
 
   def handleRelationMessage(msg: MessagesRelation): Unit
+
+  def handleOtherMessages: PartialFunction[Any, Unit] = PartialFunction.empty
 }
 
 trait CollectorConstructor {
-  def fromConfig(config: Config)(implicit ec: ExecutionContext): Collector
+  def propsFromConfig(config: Config): Props
 }
 
-class NoOpCollector(implicit val ec: ExecutionContext) extends Collector {
+class NoOpCollector extends Collector {
 
   override def handleSenderMessage(msg: SenderMessage): Unit = {}
 
@@ -30,7 +45,5 @@ class NoOpCollector(implicit val ec: ExecutionContext) extends Collector {
 }
 
 class NoOpCollectorConstructor extends CollectorConstructor {
-  override def fromConfig(config: Config)(implicit ec: ExecutionContext): Collector = {
-    new NoOpCollector
-  }
+  override def propsFromConfig(config: Config): Props = Props[NoOpCollector]
 }
