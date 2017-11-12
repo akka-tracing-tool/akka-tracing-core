@@ -20,7 +20,7 @@ class ByClassesDenyMessageFilter(val deniedClasses: List[Class[_]]) extends Mess
 
 class StackedConjunctionMessageFilter(val filters: List[MessageFilter]) extends MessageFilter {
   override def apply(message: Any): Boolean = {
-    !filters.exists(filter => !filter(message))
+    filters.forall(filter => filter(message))
   }
 }
 

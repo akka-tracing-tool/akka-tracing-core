@@ -1,16 +1,16 @@
 package pl.edu.agh.iet.akka_tracing.config
 
+import akka.actor.{ ActorRef, ActorSystem }
 import com.typesafe.config.{ Config, ConfigFactory }
-import ConfigUtils._
-import pl.edu.agh.iet.akka_tracing.collector.{ Collector, CollectorConstructor }
+import pl.edu.agh.iet.akka_tracing.collector.CollectorConstructor
+import pl.edu.agh.iet.akka_tracing.config.ConfigUtils._
 import pl.edu.agh.iet.akka_tracing.filtering._
 import pl.edu.agh.iet.akka_tracing.visualization.data.{ DataSource, DataSourceConstructor }
 
 import scala.concurrent.ExecutionContext
 
-class ConfigurationReader (config: Config, classLoader: ClassLoader)
-                          (implicit ec: ExecutionContext) {
-  private val rootConfig = config.getConfig("akka_tracing")
+class ConfigurationReader (config: Config, classLoader: ClassLoader) {
+  private val rootConfig = config \ "akka_tracing"
   private val filtersConfig =
     rootConfig.getOrElse[Config]("filters", ConfigFactory.empty("Filters"))
   private val actorFilterConfig =
@@ -30,7 +30,7 @@ class ConfigurationReader (config: Config, classLoader: ClassLoader)
       .readActorConfiguration()
   }
 
-  def getCollector: Collector = {
+  def createCollector(system: ActorSystem): ActorRef = {
     val PackagePrefix = "pl.edu.agh.iet.akka_tracing.collector"
     val NoOpCollectorClassNames = Seq("noop", "NoOpCollector", s"$PackagePrefix.NoOpCollector")
     val RelationalDatabaseCollectorClassNames = Seq(
@@ -50,7 +50,7 @@ class ConfigurationReader (config: Config, classLoader: ClassLoader)
       case s if CouchDbCollectorClassNames contains s =>
         s"$PackagePrefix.CouchDbCollectorConstructor"
       case _ =>
-        collectorConfig.getString("constructorClassName")
+        collectorConfig.get[String]("constructorClassName")
     }
 
     val constructor = classLoader
@@ -58,10 +58,10 @@ class ConfigurationReader (config: Config, classLoader: ClassLoader)
       .newInstance()
       .asInstanceOf[CollectorConstructor]
 
-    constructor.fromConfig(collectorConfig)
+    system.actorOf(constructor.propsFromConfig(collectorConfig), "collector")
   }
 
-  def getDataSource: DataSource = {
+  def createDataSource(implicit ec: ExecutionContext): DataSource = {
     val PackagePrefix = "pl.edu.agh.iet.akka_tracing.visualization.data"
     val NoOpDataSource = Seq("noop", "NoOpDataSource", s"$PackagePrefix.NoOpDataSource")
     val RelationalDatabaseCollectorClassNames = Seq(
@@ -81,7 +81,7 @@ class ConfigurationReader (config: Config, classLoader: ClassLoader)
       case s if CouchDbCollectorClassNames contains s =>
         s"$PackagePrefix.CouchDbDataSourceConstructor"
       case _ =>
-        collectorConfig.getString("constructorClassName")
+        collectorConfig.get[String]("constructorClassName")
     }
 
     val constructor = classLoader
